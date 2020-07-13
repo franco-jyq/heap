@@ -214,6 +214,41 @@ void prueba_heap_alternativo (){
     free(v);  
 }
 
+void prueba_encolar_y_desencolar(){
+    printf("INICIO PRUEBAS ENCOLAR Y DESENCOLAR MULTIPLE \n");
+    /*Creo el heap*/
+    heap_t* heap = heap_crear(cmp_int);
+    print_test("Se creo el heap",heap != NULL);
+    
+    /*Declaro variables*/
+    int dato1 = 1;
+    int dato2 = 2;
+    int dato3 = 3;
+    int dato4 = 4;
+    int dato5 = 5;
+
+    /*Prueba desencolar y encolar multiple*/
+    print_test("encolo el elemento 1", heap_encolar(heap, &dato1));
+    print_test("encolo el elemento 3", heap_encolar(heap, &dato3));
+    print_test("desencolar devuelve dato 3", heap_desencolar(heap) == &dato3);
+    print_test("desencolar devuelve dato 1", heap_desencolar(heap) == &dato1);
+    print_test("el heap quedo vacio", heap_esta_vacio(heap));
+    print_test("encolo el elemento 2", heap_encolar(heap, &dato2));
+    print_test("encolo el elemento 5", heap_encolar(heap, &dato5));
+    print_test("encolo el elemento 4", heap_encolar(heap, &dato4));
+    print_test("la cantidad es 3", heap_cantidad(heap) == 3);
+    print_test("desencolar devuelve el dato 5", heap_desencolar(heap) == &dato5);
+    print_test("el heap no esta vacio", !heap_esta_vacio(heap));
+    print_test("desencolar devuelve el dato 4", heap_desencolar(heap) == &dato4);
+    print_test("el heap no esta vacio", !heap_esta_vacio(heap));
+    print_test("desencolar devuelve el dato 2", heap_desencolar(heap) == &dato2);
+    print_test("la cantidad es 0", heap_cantidad(heap) == 0);
+
+    /*Destruto el heap*/
+    heap_destruir(heap, NULL);
+}
+
+
 void prueba_heapsort(){
     printf("INICIO PRUEBA HEAPSORT \n");
     
@@ -285,7 +320,7 @@ void prueba_volumen_con_arreglo(){
     }
 
     /*Creo el heap*/
-    heap_t* heap = heap_crear_arr(arr, 10,cmp_int);
+    heap_t* heap = heap_crear_arr(arr, 10, cmp_int);
     
     /*Pruebas*/
     for(size_t x = 10; x < 5000; x++){
@@ -305,6 +340,31 @@ void prueba_volumen_con_arreglo(){
     free(arr);
 }
 
+void prueba_con_funcion_destruir(){
+    printf("PRUEBA CON FUNCION DESTRUIR \n");
+    /*Creo el heap*/
+    heap_t* heap = heap_crear(cmp_int);
+
+    /*Inicializo variables*/
+    int* a = malloc(sizeof(int));
+    *a = 1; 
+    int* b = malloc(sizeof(int));
+    *b = 2;
+    int* c = malloc(sizeof(int)); 
+    *c = 3;
+
+    /*Encolo los elementos*/
+    print_test("Se puedo encolar el primer elemento en el heap",heap_encolar(heap, a));
+    print_test("Se puedo encolar el segundo elemento en el heap",heap_encolar(heap, b));
+    print_test("Se puedo encolar el tercer elemento en el heap",heap_encolar(heap, c));
+
+    /*Destruyo con funcion*/
+    heap_destruir(heap, free);
+    print_test("Se destruyo correctamente con funcion destruir", true);
+
+
+}
+
 void pruebas_heap_alumno(void){
     
     prueba_heap_vacio();
@@ -313,7 +373,9 @@ void pruebas_heap_alumno(void){
     prueba_heap_vacio_alternativa();    
     prueba_guardar_varios_elementos_alternativa (); 
     prueba_heap_alternativo ();
+    prueba_encolar_y_desencolar();
     prueba_heapsort();
     prueba_volumen_sin_arreglo();
     prueba_volumen_con_arreglo();
+    prueba_con_funcion_destruir();
 }

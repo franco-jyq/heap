@@ -2,8 +2,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
-#define TAMANIO_INICIAL 5
+#define TAMANIO_INICIAL 50 
 #define CONSTANTE_DE_REDIMENSION 2
+
 struct heap{
     void** datos;
     size_t tam;
@@ -28,7 +29,7 @@ heap_t* heap_crear(cmp_func_t cmp){
 }
 
 void heapify (void** datos,cmp_func_t cmp,size_t final){
-
+    
     for (int i = (int)final / 2 ; i >= 0; i--){
         downheap(datos, cmp, i, final);
     }
@@ -44,10 +45,10 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
         free(heap);
         return NULL;
     }
-    for (size_t i = 0;i < n;i++){
+    for (size_t i = 0; i < n; i++){
         heap->datos[i] = arreglo[i];
     }
-    if( n > 0) heapify(heap->datos,cmp,n-1);
+    if(n > 0) heapify(heap->datos, cmp, n - 1);
     heap->tam = tam;
     heap->cant = n;
     heap->cmp = cmp;
@@ -55,7 +56,7 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
 }
 
 void heap_destruir(heap_t *heap, void (*destruir_elemento)(void *e)){
-    for (size_t i = 0;i < heap->tam;i++){
+    for (size_t i = 0; i < heap->cant; i++){
         if (destruir_elemento) destruir_elemento(heap->datos[i]);
     }
     free(heap->datos);
@@ -71,19 +72,20 @@ bool heap_esta_vacio(const heap_t *heap){
 }
 
 bool heap_redimensionar(heap_t* heap){
-    if (heap->tam == heap->cant){
-        void** datos = realloc(heap->datos, sizeof(void*) * heap->tam * CONSTANTE_DE_REDIMENSION);
-        if(!datos) return false;
-        heap->datos = datos;
+    int var = 0;
+    if (heap->cant >= heap->tam){
         heap->tam *= CONSTANTE_DE_REDIMENSION;
+        var++;
     }
     if (heap->cant * 4 <= heap->tam && heap->cant > TAMANIO_INICIAL){
-        void** datos = realloc(heap->datos, sizeof(void*) * (heap->tam / CONSTANTE_DE_REDIMENSION));
+        heap->tam /= CONSTANTE_DE_REDIMENSION;
+        var ++;
+    }
+    if(var > 0){
+        void** datos = realloc(heap->datos, sizeof(void*) * heap->tam);
         if(!datos) return false;
         heap->datos = datos;
-        heap->tam /= CONSTANTE_DE_REDIMENSION;
     }
-
     return true;
 }
 
@@ -101,9 +103,9 @@ void upheap (void** datos,cmp_func_t cmp,size_t actual){
 
 bool heap_encolar(heap_t *heap, void *elem){
     heap->cant++;
-    if (!heap_redimensionar(heap)) return false; 
+    if (!heap_redimensionar(heap)) return false;    
     heap->datos[heap->cant - 1] = elem;
-    upheap (heap->datos,heap->cmp,heap->cant - 1);
+    upheap (heap->datos, heap->cmp, heap->cant - 1);
     return true;
 }
 
@@ -112,7 +114,7 @@ void *heap_ver_max(const heap_t *heap){
     return heap->datos[0];
 }
 
-void downheap(void** datos,cmp_func_t cmp,size_t actual,size_t cant){
+void downheap(void** datos, cmp_func_t cmp, size_t actual,size_t cant){
     if (actual >= cant) return;
     size_t hijo_izq = 2 * actual + 1;
     size_t hijo_der = 2 * actual + 2;
