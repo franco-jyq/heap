@@ -2,8 +2,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
-#define TAMANIO_INICIAL 50
-
+#define TAMANIO_INICIAL 5
+#define CONSTANTE_DE_REDIMENSION 2
 struct heap{
     void** datos;
     size_t tam;
@@ -28,16 +28,18 @@ heap_t* heap_crear(cmp_func_t cmp){
 }
 
 void heapify (void** datos,cmp_func_t cmp,size_t final){
-    if (final == -1) return; // falopa 
-    for (size_t i = final / 2; i >= 0;i--){
-        downheap(datos,cmp,i,final);
+
+    for (int i = (int)final / 2 ; i >= 0; i--){
+        downheap(datos, cmp, i, final);
     }
 }
 
 heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
     heap_t* heap = malloc(sizeof(heap_t));
     if (!heap) return NULL;
-    heap->datos = malloc(sizeof(void*)*TAMANIO_INICIAL);
+    size_t tam = TAMANIO_INICIAL;
+    if(n > TAMANIO_INICIAL) tam = n;
+    heap->datos = malloc(sizeof(void*)* tam);
     if (!heap->datos){
         free(heap);
         return NULL;
@@ -45,8 +47,8 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
     for (size_t i = 0;i < n;i++){
         heap->datos[i] = arreglo[i];
     }
-    heapify(heap->datos,cmp,n-1);
-    heap->tam = TAMANIO_INICIAL;
+    if( n > 0) heapify(heap->datos,cmp,n-1);
+    heap->tam = tam;
     heap->cant = n;
     heap->cmp = cmp;
     return heap;
@@ -69,7 +71,19 @@ bool heap_esta_vacio(const heap_t *heap){
 }
 
 bool heap_redimensionar(heap_t* heap){
-    if (heap->tam == TAMANIO_INICIAL) return true;
+    if (heap->tam == heap->cant){
+        void** datos = realloc(heap->datos, sizeof(void*) * heap->tam * CONSTANTE_DE_REDIMENSION);
+        if(!datos) return false;
+        heap->datos = datos;
+        heap->tam *= CONSTANTE_DE_REDIMENSION;
+    }
+    if (heap->cant * 4 <= heap->tam && heap->cant > TAMANIO_INICIAL){
+        void** datos = realloc(heap->datos, sizeof(void*) * (heap->tam / CONSTANTE_DE_REDIMENSION));
+        if(!datos) return false;
+        heap->datos = datos;
+        heap->tam /= CONSTANTE_DE_REDIMENSION;
+    }
+
     return true;
 }
 
@@ -126,5 +140,12 @@ void *heap_desencolar(heap_t *heap){
 }
 
 void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
+    if(cant <= 1) return; 
     heapify(elementos,cmp,cant-1);
+    for(int x = (int)cant - 1; x != 0; x --){
+        void* aux = elementos[0];
+        elementos[0] = elementos[x];
+        elementos[x] = aux;
+        downheap(elementos, cmp, 0, x - 1);
+    }
 }

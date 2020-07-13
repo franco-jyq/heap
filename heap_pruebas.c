@@ -114,27 +114,33 @@ void prueba_heap_alternativo (){
     v[3] = v2+3;
     v[4] = v2+4;
     heap_t* heap = heap_crear_arr(v,5,cmp_int);
+    
     print_test("Se creo el heap",heap != NULL);
     print_test("La cantidad de elementos es 5",heap_cantidad(heap) == 5);
     print_test("El heap no esta vacio",!heap_esta_vacio(heap));
-    print_test("Ver el maximo devuelve el elemento correcto",heap_ver_max(heap) == v+2);
-    print_test("Desencolar devuelve el elemento correcto",heap_desencolar(heap) == v+2);
+    print_test("Ver el maximo devuelve el elemento correcto",heap_ver_max(heap) == v[2]);
+    print_test("Desencolar devuelve el elemento correcto",heap_desencolar(heap) == v[2]);
+   
     print_test("La cantidad de elementos es 4",heap_cantidad(heap) == 4);
     print_test("El heap no esta vacio",!heap_esta_vacio(heap));
-    print_test("Ver el maximo devuelve el elemento correcto",heap_ver_max(heap) == v+4);
-    print_test("Desencolar devuelve el elemento correcto",heap_desencolar(heap) == v+4);
+    print_test("Ver el maximo devuelve el elemento correcto",heap_ver_max(heap) == v[4]);
+    print_test("Desencolar devuelve el elemento correcto",heap_desencolar(heap) == v[4]);
+    
     print_test("La cantidad de elementos es 3",heap_cantidad(heap) == 3);
     print_test("El heap no esta vacio",!heap_esta_vacio(heap));    
-    print_test("Ver el maximo devuelve el elemento correcto",heap_ver_max(heap) == v+1);
-    print_test("Desencolar devuelve el elemento correcto",heap_desencolar(heap) == v+1);
+    print_test("Ver el maximo devuelve el elemento correcto",heap_ver_max(heap) == v[1]);
+    print_test("Desencolar devuelve el elemento correcto",heap_desencolar(heap) == v[1]);
+    
     print_test("La cantidad de elementos es 2",heap_cantidad(heap) == 2);
     print_test("El heap no esta vacio",!heap_esta_vacio(heap));
-    print_test("Ver el maximo devuelve el elemento correcto",heap_ver_max(heap) == v);
-    print_test("Desencolar devuelve el elemento correcto",heap_desencolar(heap) == v);
+    print_test("Ver el maximo devuelve el elemento correcto",heap_ver_max(heap) == v[0]);
+    print_test("Desencolar devuelve el elemento correcto",heap_desencolar(heap) == v[0]);
+    
     print_test("La cantidad de elementos es 1",heap_cantidad(heap) == 1);
     print_test("El heap no esta vacio",!heap_esta_vacio(heap));
-    print_test("Ver el maximo devuelve el elemento correcto",heap_ver_max(heap) == v+3);
-    print_test("Desencolar devuelve el elemento correcto",heap_desencolar(heap) == v+3);
+    print_test("Ver el maximo devuelve el elemento correcto",heap_ver_max(heap) == v[3]);
+    print_test("Desencolar devuelve el elemento correcto",heap_desencolar(heap) == v[3]);
+    
     print_test("La cantidad de elementos es 0",heap_cantidad(heap) == 0);
     print_test("El heap esta vacio",heap_esta_vacio(heap));
     heap_destruir(heap,NULL);
@@ -142,16 +148,78 @@ void prueba_heap_alternativo (){
     free(v);  
 }
 
-void prueba_heapsort (){
+void prueba_heapsort(){
+    printf("INICIO PRUEBA HEAPSORT \n");
+    int v2[5] = {3,4,10,1,6};
+    void** v = malloc(sizeof(int*)*5);
+    v[0] = v2;
+    v[1] = v2+1;
+    v[2] = v2+2;
+    v[3] = v2+3;
+    v[4] = v2+4;
+
+    heap_sort(v, 5, cmp_int);
     
+    int  min = *(int*)v[0];
+    bool todo_ok = true;
+    for(int x = 0; x < 5; x++){
+        if(*(int*)v[x] < min) todo_ok = false;
+        min = *(int*)v[x];
+    }
+    print_test("El arreglo quedo ordenado", todo_ok == true);
+    free(v);
+}
+
+void prueba_volumen_sin_arreglo(){
+    heap_t* heap = heap_crear(cmp_int);
+    bool todo_ok = true;
+    int v[5000];
+    for(int x = 0; x < 5000; x++){
+        v[x] = x;
+    }
+    for(size_t x = 0; x < 5000; x++){
+        heap_encolar(heap, v + x);
+    }
+    for(size_t x = 0; x < 5000; x++){
+        if(heap_desencolar(heap) != v + 4999 -x)todo_ok = false;  
+    }
+    print_test("Se desencolaron todos los elementos en el orden correcto", todo_ok);
+    heap_destruir(heap, NULL);
+}
+
+void prueba_volumen_con_arreglo(){
+    bool todo_ok = true;
+    void** arr = malloc(sizeof(void*)* 10);
+    int v[5000];    
+    for(int x = 0; x < 5000; x++){
+        v[x] = x;
+    }
+    for(int x = 0; x < 10; x++){
+        arr[x] = v + x;
+    }
+    heap_t* heap = heap_crear_arr(arr, 10,cmp_int);
+    
+    for(size_t x = 10; x < 5000; x++){
+        heap_encolar(heap, v + x);
+    }
+
+    for(size_t x = 0; x < 5000; x++){
+        if(heap_desencolar(heap) != v + 4999 -x)todo_ok = false;  
+    }
+    
+    print_test("Se desencolaron todos los elementos en el orden correcto", todo_ok);
+    heap_destruir(heap, NULL);
 }
 
 void pruebas_heap_alumno(void){
-    /*
+    
     prueba_heap_vacio();
     prueba_guardar_unitaria();
     prueba_guardar_varios_elementos();
     prueba_heap_vacio_alternativa();    
-    prueba_guardar_varios_elementos_alternativa (); */
+    prueba_guardar_varios_elementos_alternativa (); 
     prueba_heap_alternativo ();
+    prueba_heapsort();
+    prueba_volumen_sin_arreglo();
+    prueba_volumen_con_arreglo();
 }
